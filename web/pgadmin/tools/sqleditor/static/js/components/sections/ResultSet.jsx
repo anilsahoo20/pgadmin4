@@ -753,6 +753,8 @@ export class ResultSetUtils {
       }
       this.eventBus.fireEvent(QUERY_TOOL_EVENTS.SET_MESSAGE, tabMsg, true);
       this.eventBus.fireEvent(QUERY_TOOL_EVENTS.FOCUS_PANEL, PANELS.MESSAGES);
+      /* Clear the query data if the query has no result to display.*/
+      onResultsAvailable(null, [], []);
     }
     return retMsg;
   }
@@ -1036,6 +1038,7 @@ export function ResultSet() {
       } else {
         setAllRowsSelect('NONE');
       }
+      setSelectedColumns(new Set());
     });
 
     eventBus.registerListener(QUERY_TOOL_EVENTS.ALL_ROWS_SELECTED, ()=>{
@@ -1533,6 +1536,7 @@ export function ResultSet() {
             onSelectedColumnsChange={setSelectedColumns}
             onSelectedCellChange={setSelectedCell}
             onSelectedRangeChange={setSelectedRange}
+            stripedRows={queryToolCtx.preferences?.sqleditor?.striped_rows}
           />
         </Box>
       </>}

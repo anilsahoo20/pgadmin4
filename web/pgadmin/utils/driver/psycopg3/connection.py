@@ -233,7 +233,10 @@ class Connection(BaseConnection):
             kwargs.pop('password')
             is_update_password = False
         else:
-            encpass = kwargs['password'] if 'password' in kwargs else None
+            if 'encpass' in kwargs:
+                encpass = kwargs['encpass']
+            else:
+                encpass = kwargs['password'] if 'password' in kwargs else None
 
         return password, encpass, is_update_password
 
@@ -1507,7 +1510,8 @@ Failed to reset the connection to the server due to following error:
                         for col in self.column_info:
                             col['pos'] = pos
                             pos += 1
-
+                else:
+                    self.column_info = None
                 self.row_count = cur.get_rowcount()
                 if not no_result and cur.get_rowcount() > 0:
                     result = []
