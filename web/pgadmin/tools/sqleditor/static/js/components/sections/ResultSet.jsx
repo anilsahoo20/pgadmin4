@@ -300,7 +300,17 @@ export class ResultSetUtils {
         }, ()=>{
           /*This is intentional (SonarQube)*/
         });
-      } else {
+      }else if (e?.response?.data.info == 'CRYPTKEY_MISSING'){
+        let pgBrowser = window.pgAdmin.Browser;
+        pgBrowser.set_master_password('', async (passwordData)=>{
+          await this.connectServer(this.queryToolCtx.params.sid, this.queryToolCtx.params.user, passwordData, async ()=>{
+            await this.eventBus.fireEvent(QUERY_TOOL_EVENTS.REINIT_QT_CONNECTION, '', explainObject, macroSQL, flags.executeCursor, true);
+          });
+        }, ()=> {
+          /*This is intentional (SonarQube)*/
+        });
+        return;
+      }else {
         this.eventBus.fireEvent(QUERY_TOOL_EVENTS.EXECUTION_END);
         this.eventBus.fireEvent(QUERY_TOOL_EVENTS.HANDLE_API_ERROR,
           e,
@@ -675,15 +685,18 @@ export class ResultSetUtils {
       return retVal;
     }
     let copiedRowsObjects = [];
-    try {
-      /* If the raw row objects are available, use to them identify null values */
-      copiedRowsObjects = JSON.parse(localStorage.getItem('copied-rows'));
-    } catch {/* Suppress the error */}
+    if(fromClipboard) {
+      try {
+        /* If the raw row objects are available, use to them identify null values */
+        copiedRowsObjects = JSON.parse(localStorage.getItem('copied-rows'));
+      } catch {/* Suppress the error */}
+    }
     for(const [recIdx, rec] of result?.entries()??[]) {
       // Convert 2darray to dict.
       let rowObj = {};
       for(const col of columns) {
-        let columnVal = rec[col.pos];
+        // if column data is undefined and there is not default value then set it to null.
+        let columnVal = rec[col.pos] ?? (col.has_default_val ? undefined : null);
         /* If the source is clipboard, then it needs some extra handling */
         if(fromClipboard) {
           columnVal = this.processClipboardVal(columnVal, col, copiedRowsObjects[recIdx]?.[col.key], pasteSerials);
