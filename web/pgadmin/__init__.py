@@ -36,6 +36,7 @@ from werkzeug.datastructures import ImmutableDict
 from werkzeug.local import LocalProxy
 from werkzeug.utils import find_modules
 from jinja2 import select_autoescape
+from flask_wtf.csrf import CSRFError
 
 from pgadmin.model import db, Role, Server, SharedServer, ServerGroup, \
     User, Keys, Version, SCHEMA_VERSION as CURRENT_SCHEMA_VERSION
@@ -45,7 +46,8 @@ from pgadmin.utils.session import create_session_interface, pga_unauthorised
 from pgadmin.utils.versioned_template_loader import VersionedTemplateLoader
 from datetime import timedelta, datetime
 from pgadmin.setup import get_version, set_version, check_db_tables
-from pgadmin.utils.ajax import internal_server_error, make_json_response
+from pgadmin.utils.ajax import internal_server_error, make_json_response, \
+    unauthorized
 from pgadmin.utils.csrf import pgCSRFProtect
 from pgadmin import authenticate
 from pgadmin.utils.security_headers import SecurityHeaders
@@ -829,7 +831,7 @@ def create_app(app_name=None):
         # but the user session may still be active. Logout the user
         # to get the key again when login
         if config.SERVER_MODE and current_user.is_authenticated and \
-            app.PGADMIN_EXTERNAL_AUTH_SOURCE not in [
+            session['auth_source_manager']['current_source'] not in [
                 KERBEROS, OAUTH2, WEBSERVER] and \
                 current_app.keyManager.get() is None and \
                 request.endpoint not in ('security.login', 'security.logout'):
@@ -917,7 +919,14 @@ def create_app(app_name=None):
         current_app.logger.error(e, exc_info=True)
         return e
 
-    # Intialize the key manager
+    # Send unauthorized response if CSRF errors occurs.
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(error):
+        err_msg = str(error.description) + \
+            gettext(' You need to refresh the page.')
+        return unauthorized(errormsg=err_msg)
+
+    # Initialize the key manager
     app.keyManager = KeyManager()
 
     ##########################################################################

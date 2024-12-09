@@ -15,6 +15,35 @@ import {default as supportedServers} from 'pgadmin.server.supported_servers';
 import current_user from 'pgadmin.user_management.current_user';
 import { isEmptyString } from 'sources/validators';
 import VariableSchema from './variable.ui';
+import { getRandomColor } from '../../../../../static/js/utils';
+
+class TagsSchema extends BaseUISchema {
+  get idAttribute() { return 'old_text'; }
+
+  get baseFields() {
+    return [
+      {
+        id: 'text', label: gettext('Text'), cell: 'text', group: null,
+        mode: ['create', 'edit'], noEmpty: true, controlProps: {
+          maxLength: 30,
+        }
+      },
+      {
+        id: 'color', label: gettext('Color'), cell: 'color', group: null,
+        mode: ['create', 'edit'], controlProps: {
+          input: true,
+        }
+      },
+    ];
+  }
+
+  getNewData(data) {
+    return {
+      ...data,
+      color: getRandomColor(),
+    };
+  }
+}
 
 export default class ServerSchema extends BaseUISchema {
   constructor(serverGroupOptions=[], userId=0, initValues={}) {
@@ -50,11 +79,13 @@ export default class ServerSchema extends BaseUISchema {
       connection_params: [
         {'name': 'sslmode', 'value': 'prefer', 'keyword': 'sslmode'},
         {'name': 'connect_timeout', 'value': 10, 'keyword': 'connect_timeout'}],
+      tags: [],
       ...initValues,
     });
 
     this.serverGroupOptions = serverGroupOptions;
     this.paramSchema = new VariableSchema(this.getConnectionParameters(), null, null, ['name', 'keyword', 'value']);
+    this.tagsSchema = new TagsSchema();
     this.userId = userId;
     _.bindAll(this, 'isShared');
   }
@@ -109,8 +140,8 @@ export default class ServerSchema extends BaseUISchema {
       {
         id: 'bgcolor', label: gettext('Background'), type: 'color',
         group: null, mode: ['edit', 'create'],
-        disabled: obj.isConnected, deps: ['fgcolor'], depChange: (state)=>{
-          if(!state.bgcolor && state.fgcolor) {
+        disabled: obj.isConnected, deps: ['fgcolor'], depChange: (state, source)=>{
+          if(source[0] == 'fgcolor' && !state.bgcolor && state.fgcolor) {
             return {'bgcolor': '#ffffff'};
           }
         }
@@ -349,6 +380,7 @@ export default class ServerSchema extends BaseUISchema {
         group: gettext('Advanced'), controlProps: {maxLength: null},
         mode: ['properties', 'edit', 'create'],
         disabled: pgAdmin.server_mode == 'True' && pgAdmin.enable_server_passexec_cmd == 'False',
+        helpMessage: gettext('The server hostname, port, and username can be passed as variables by using the placeholders %HOST%, %PORT%, and %USERNAME%, which will be replaced with the corresponding server connection information.')
       },
       {
         id: 'passexec_expiration', label: gettext('Password exec expiration (seconds)'), type: 'int',
@@ -364,7 +396,13 @@ export default class ServerSchema extends BaseUISchema {
         mode: ['properties', 'edit', 'create'],
         helpMessageMode: ['edit', 'create'],
         helpMessage: gettext('If it is set to 0, every query is prepared the first time it is executed. If it is set to blank, prepared statements are disabled on the connection.')
-      }
+      },
+      {
+        id: 'tags', label: gettext('Tags'),
+        type: 'collection', group: gettext('Tags'),
+        schema: this.tagsSchema, mode: ['edit', 'create'], uniqueCol: ['text'],
+        canAdd: true, canEdit: false, canDelete: true, maxCount: pgAdmin.Browser.utils.max_server_tags_allowed,
+      },
     ];
   }
 

@@ -34,12 +34,12 @@
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.0",
-    "eslint": "^9.11.1",
+    "eslint": "^9.16.0",
     "eslint-plugin-jest": "^28.8.0",
     "eslint-plugin-react": "^7.34.3",
     "eslint-plugin-unused-imports": "^4.1.4",
     "exports-loader": "^5.0.0",
-    "globals": "^15.8.0",
+    "globals": "^15.13.0",
     "html-react-parser": "^5.0.6",
     "image-minimizer-webpack-plugin": "^4.0.2",
     "imagemin": "^9.0.0",
@@ -67,7 +67,7 @@
     "webpack": "^5.88.2",
     "webpack-bundle-analyzer": "^4.8.0",
     "webpack-cli": "^5.1.4",
-    "yarn-audit-html": "4.0.0"
+    "yarn-audit-html": "7.3.2"
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.4",
@@ -81,14 +81,14 @@
     "@mui/icons-material": "^6.1.8",
     "@mui/lab": "^6.0.0-beta.16",
     "@mui/material": "^6.1.8",
-    "@mui/x-date-pickers": "^7.22.3",
+    "@mui/x-date-pickers": "^7.23.0",
     "@projectstorm/react-diagrams": "^7.0.4",
     "@simonwep/pickr": "^1.5.1",
     "@szhsin/react-menu": "^4.2.2",
-    "@tanstack/react-query": "5.59.20",
+    "@tanstack/react-query": "5.62.2",
     "@tanstack/react-table": "^8.16.0",
     "@tanstack/react-virtual": "^3.8.4",
-    "@types/classnames": "^2.2.6",
+    "@types/classnames": "^2.3.4",
     "@types/react": "^18.0.2",
     "@types/react-dom": "^18.0.0",
     "@xterm/addon-fit": "^0.10.0",
@@ -151,7 +151,7 @@
     "uplot-react": "^1.1.4",
     "valid-filename": "^4.0.0",
     "wkx": "^0.5.0",
-    "zustand": "^4.5.4"
+    "zustand": "^5.0.1"
   },
   "scripts": {
     "linter": "yarn run eslint -c .eslintrc.js .",
@@ -174,7 +174,7 @@
     "auditpy": "safety check --full-report -i 51668 -i 52495",
     "audit-all": "yarn run auditjs && yarn run auditpy"
   },
-  "packageManager": "yarn@3.8.6",
+  "packageManager": "yarn@3.8.7",
   "browserslist": [
     "defaults and fully supports es6-module"
   ]
