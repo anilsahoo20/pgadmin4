@@ -6,7 +6,7 @@
 // This software is released under the PostgreSQL Licence
 //
 //////////////////////////////////////////////////////////////
-import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell, autoUpdater } from 'electron';
 import axios from 'axios';
 import Store from 'electron-store';
 import fs from 'fs';
@@ -422,3 +422,46 @@ app.whenReady().then(() => {
 
   splashWindow.show();
 });
+
+const server = 'https://github.com/anilsahoo20/pgadmin4-autoupdate/tree/main/builds'
+const url = `${server}/${process.platform}/${app.getVersion()}`
+
+autoUpdater.setFeedURL({ url })
+
+setInterval(() => {
+  autoUpdater.checkForUpdates()
+  console.log('checking for updates', `current version is ${app.getVersion()}`)
+}, 5000)
+//43200000
+//300000
+
+autoUpdater.on('checking-for-update', () => {
+  const dialogOpts = {
+    type: 'info',
+    title: 'Checking for Update',
+    message: `checking for updates, current version is ${app.getVersion()}`,
+  }
+
+  dialog.showMessageBox(dialogOpts)
+})
+
+
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Restart', 'Later'],
+    title: 'Application Update',
+    message: releaseName,
+    detail:
+      'A new version has been downloaded. Restart the application to apply the updates.'
+  }
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) autoUpdater.quitAndInstall()
+  })
+})
+
+autoUpdater.on('error', (message) => {
+  console.error('There was a problem updating the application')
+  console.error(message)
+})

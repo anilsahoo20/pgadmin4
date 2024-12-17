@@ -6,6 +6,7 @@
   "license": "PostgreSQL",
   "type": "module",
   "main": "src/js/pgadmin.js",
+  "version":"8.14",
   "scripts": {
     "start": "electron .",
     "linter": "yarn run eslint -c .eslintrc.js ."
