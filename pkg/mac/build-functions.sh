@@ -471,3 +471,10 @@ _notarize_pkg() {
 
     echo "Notarization completed successfully."
 }
+
+_convert_to_zip() {
+    echo "Created DMG file: ${DMG_NAME}"
+    ZIP_NAME="${DMG_NAME%.dmg}.zip"
+    zip -j "${ZIP_NAME}" "${DMG_NAME}"
+    echo "Created ZIP file: ${ZIP_NAME}"
+}

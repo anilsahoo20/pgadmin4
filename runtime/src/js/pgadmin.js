@@ -430,20 +430,36 @@ autoUpdater.setFeedURL({ url })
 
 setInterval(() => {
   autoUpdater.checkForUpdates()
-  console.log('checking for updates', `current version is ${app.getVersion()}`)
-}, 5000)
-//43200000
-//300000
-
-autoUpdater.on('checking-for-update', () => {
   const dialogOpts = {
     type: 'info',
     title: 'Checking for Update',
-    message: `checking for updates, current version is ${app.getVersion()}`,
+    message: `checking for updates, current version is ${app.getVersion()} & url is ${autoUpdater.getFeedURL()}`,
+  }
+
+  dialog.showMessageBox(dialogOpts)
+  console.log('checking for updates', `current version is ${app.getVersion()}`)
+}, 30000)
+//43200000
+//300000
+autoUpdater.on('update-not-available', () => {
+  const dialogOpts = {
+    type: 'info',
+    title: 'No update available',
+    message: `No update available. Current version ${app.getVersion()}`,
   }
 
   dialog.showMessageBox(dialogOpts)
 })
+
+// autoUpdater.on('checking-for-update', () => {
+//   const dialogOpts = {
+//     type: 'info',
+//     title: 'Checking for Update',
+//     message: `checking for updates, current version is ${app.getVersion()}`,
+//   }
+
+//   dialog.showMessageBox(dialogOpts)
+// })
 
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {

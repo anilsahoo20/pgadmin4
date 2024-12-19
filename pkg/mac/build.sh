@@ -72,3 +72,4 @@ _codesign_bundle
 _create_dmg
 _codesign_dmg
 _notarize_pkg
+_convert_to_zip
