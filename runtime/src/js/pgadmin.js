@@ -423,22 +423,22 @@ app.whenReady().then(() => {
   splashWindow.show();
 });
 
-const server = 'https://github.com/anilsahoo20/pgadmin4-autoupdate/tree/main/builds'
-const url = `${server}/${process.platform}/${app.getVersion()}`
-
+const server = 'http://127.0.0.1:8000/download/updates'
+const url = `${server}/${app.getVersion()}/${process.platform}/${process.arch}/`
+// console.log(url)
 autoUpdater.setFeedURL({ url })
 
 setInterval(() => {
   autoUpdater.checkForUpdates()
-  const dialogOpts = {
-    type: 'info',
-    title: 'Checking for Update',
-    message: `checking for updates, current version is ${app.getVersion()} & url is ${autoUpdater.getFeedURL()}`,
-  }
+  // const dialogOpts = {
+  //   type: 'info',
+  //   title: 'Checking for Update',
+  //   message: `checking for updates, current version is ${app.getVersion()} & url is ${autoUpdater.getFeedURL()}`,
+  // }
 
-  dialog.showMessageBox(dialogOpts)
-  console.log('checking for updates', `current version is ${app.getVersion()}`)
-}, 30000)
+  // dialog.showMessageBox(dialogOpts)
+  // console.log('checking for updates', `current version is ${app.getVersion()}`)
+}, 10000)
 //43200000
 //300000
 autoUpdater.on('update-not-available', () => {
